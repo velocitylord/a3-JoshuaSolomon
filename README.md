@@ -90,6 +90,18 @@ What design elements (colors, fonts, layouts, etc.) did you use repeatedly throu
 How did you use alignment to organize information and/or increase contrast for particular elements. 
 Write a paragraph of at least 125 words *for each of four principles* (four paragraphs, 500 words in total). 
 
+
+FAQ
+---
+**Q: Which CSS framework should I use? How do I use it?**
+
+This is for you to figure out. While we do require Express and MongoDB for this assignment, we do not require a specific CSS framework, so we are not going to be discussing a specific one. You will be responsible for choosing a CSS framework and learning how to use it.
+
+**Q: How do I keep my .env file out of my git repo?**
+
+Create a .gitignore file on your local machine and list your .env file in it. Note that while your .env file should NOT appear in your repo, you will still want to add it to your Glitch project so that your website runs successfully.
+
+
 Sample Readme (delete the above when you're ready to submit, and modify the below so with your links and descriptions)
 ---
 
