@@ -93,6 +93,10 @@ Write a paragraph of at least 125 words *for each of four principles* (four para
 
 FAQ
 ---
+**Q: Am I required modify my A2 submission for this assignment?**
+
+No. If you want to start fresh for A3, you are welcome to do so. The option to start with A2 is simply there as a convenience for you.
+
 **Q: Which CSS framework should I use? How do I use it?**
 
 This is for you to figure out. While we do require Express and MongoDB for this assignment, we do not require a specific CSS framework, so we are not going to be discussing a specific one. You will be responsible for choosing a CSS framework and learning how to use it.
@@ -101,6 +105,15 @@ This is for you to figure out. While we do require Express and MongoDB for this 
 
 Create a .gitignore file on your local machine and list your .env file in it. Note that while your .env file should NOT appear in your repo, you will still want to add it to your Glitch project so that your website runs successfully.
 
+**Q: I'm confused about how user accounts work for this assignment.**
+
+For the base requirements (discounting the achievements), it should follow this logic:
+
+1. If the user logs in and the account does not exist, create the account and inform the user the account has been created.
+2. If the user logs in and the account exists but the password is incorrect, inform the user.
+3. If the user logs in, the account exists, and the password is correct, then take the user to the page that shows the data specific to the user.
+
+Note that implementing some of the technical achievements may override this requirement, which is fine.
 
 Sample Readme (delete the above when you're ready to submit, and modify the below so with your links and descriptions)
 ---
