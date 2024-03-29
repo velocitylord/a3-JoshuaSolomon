@@ -133,6 +133,9 @@ Note that if you are doing OAuth, this last part might be difficult (especially 
 
 You should have at least two different input types for this assignment. The purpose is to show your understanding beyond the simple `input` type you saw in A2.
 
+**Q: Am I allowed to use other libraries/frameworks/etc. in this assignment?**
+
+Yes, so long as those are IN ADDITION TO Express, MongoDB, and a CSS framework of your choice. Describe in your README any additional libraries or frameworks you used for this assignment. Also remember that the staff might not be familiar with these, so we may be unable to help you if you run into technical problems.
 
 
 Sample Readme (delete the above when you're ready to submit, and modify the below so with your links and descriptions)
