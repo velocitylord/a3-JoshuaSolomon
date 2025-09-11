@@ -78,7 +78,7 @@ This is for you to figure out. While we do require Express and MongoDB for this 
 
 **Q: How do I keep my .env file out of my git repo?**
 
-Create a .gitignore file on your local machine and list your .env file in it. Note that while your .env file should NOT appear in your repo, you will still want to add it to your Render project so that your website runs successfully.
+Create a .gitignore file on your local machine and list your .env file in it. Note that while your .env file should NOT appear in your repo, you will still want to [add it to your Render project](https://render.com/docs/configure-environment-variables) so that your website runs successfully.
 
 **Q: I'm confused about how user accounts work for this assignment.**
 
