@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Gino Hills Barbershop</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"> <!--title font--> 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet">
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"> <!--main font--> 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tomorrow:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class='min-h-dvh relative font-["Tomorrow",sans-serif]'>
+  
+  <div class="fixed inset-0 -z-35 bg-gradient-to-l from-orange-600 via-orange-300 to-black"></div> <!--background gradient--> 
+  <img src="/img/kidshaircut.jpg" alt="Image of Kid's modern haircut" aria-hidden="true"
+       class="fixed inset-0 -z-25 w-full h-full object-cover opacity-30"
+       loading="lazy" decoding="async" />
+  <div class="fixed inset-0 -z-10 bg-orange-500/35 mix-blend-multiply"></div>
+
+  <header class="sticky top-0 z-10">
+    <nav class="mx-auto max-w-5xl px-4 py-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-4xl md:text-5xl font-['Zen_Tokyo_Zoo'] text-white drop-shadow">
+          Gino Hills Barbershop
+        </h1>
+        <div class="flex items-center gap-3">
+          <span id="whoami" class="text-white/90 text-sm md:text-base"></span>
+          <button id="logoutBtn"
+                  class="rounded-lg bg-[#EEF4ED] px-3 py-1.5 text-sm md:text-base text-black hover:opacity-90 transition">
+            Logout
+          </button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-5xl px-4 pb-16">
+    <section
+      class="rounded-2xl bg-[#4169E1]/70 backdrop-blur-sm shadow p-6 md:p-8 mt-4 text-white
+             border border-white/20 scale-up-ver-top-normal"
+    >
+      <div class="grid sm:grid-cols-3 gap-4 items-end">
+        <div class="sm:col-span-2">
+          <label for="serviceSelect" class="block text-sm font-medium mb-1">Service</label>
+          <select id="serviceSelect"
+                  class="w-full rounded-xl border border-gray-300 bg-white text-black px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200">
+          </select>
+        </div>
+        <div>
+          <label for="tipInput" class="block text-sm font-medium mb-1">Tip %</label>
+          <input id="tipInput" type="number" step="0.01" placeholder="12% default: enter as 12"
+                 class="w-full rounded-xl border border-gray-300 bg-white text-black px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200">
+        </div>
+        <div class="sm:col-span-3">
+          <button id="addBtn"
+                  class="w-full rounded-xl bg-[#EEF4ED] py-2.5 font-semibold text-black hover:opacity-90 transition">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <h2 class="text-lg font-semibold mb-3">Cart</h2>
+        <div class="overflow-x-auto rounded-xl border border-white/30 bg-white">
+          <table id="ticketsTable" class="min-w-full border-collapse">
+            <thead class="text-left bg-white">
+              <tr class="text-sm text-gray-700">
+                <th class="px-4 py-3">Service</th>
+                <th class="px-4 py-3">Price</th>
+                <th class="px-4 py-3">Tax</th>
+                <th class="px-4 py-3">Tip</th>
+                <th class="px-4 py-3">Total</th>
+                <th class="px-4 py-3">Duration</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody class="bg-white text-gray-900"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
