@@ -7,10 +7,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tomorrow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"> 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="/styles.css">
   
 </head>
 <body class='min-h-dvh font-["Tomorrow",sans-serif]'>
+
 
   <div class="fixed inset-0 -z-35 bg-gradient-to-l from-orange-600 via-orange-300 to-black"></div> <!--gradient background--> 
 
@@ -22,9 +28,16 @@
     loading="lazy" decoding="async"
   />
 
-  <div class="fixed inset-0 -z-10 bg-orange-500/35 mix-blend-multiply"></div>
+  <div class="fixed inset-0 -z-10 bg-blue-200 mix-blend-multiply"></div>
+
+    <h2 class="fixed top-6 left-6 z-10 font-['Zen_Tokyo_Zoo'] text-3xl md:text-4xl
+           text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)] select-none">
+    Gino Hills Barbershop
+    </h2>
 
   <section class="min-h-dvh flex items-center justify-center px-4"> <!--center--> 
+
+    
    
     <div class="bg-white w-full max-w-3xl rounded-2xl shadow p-6 md:p-10 scale-up-ver-top-normal"> <!--sign up/in box--> 
       <h1 class="text-xl font-bold text-black-900">Sign in or create new account</h1>
@@ -48,29 +61,53 @@
         />
         </div>
 
+        
         <div class="relative flex items-center text-lg mb-6 md:mb-8"> <!--password box & icon--> 
-        <svg
-            class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-600"
-            viewBox="0 0 24 24" aria-hidden="true"
-            fill="none" stroke="currentColor" stroke-width="1.5"
-        >
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round"
-            d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
         </svg>
-
-        <input
-            id="password" name="password" type="password" placeholder="Password" required
-            class="bg-gray-200 w-full rounded-xl pl-12 py-2 md:py-4 focus:outline-none"
-        />
+        <input id="password" name="password" type="password" placeholder="Password" required
+                class="bg-gray-200 w-full rounded-xl pl-12 py-2 md:py-4 focus:outline-none" />
         </div>
 
-        <button
-          type="submit"
-          class="w-full rounded-xl text-white font-medium uppercase p-3 md:p-4
-                 bg-gradient-to-b from-gray-700 to-gray-900 scale-up-center-normal"
-        >
-          Login
+      
+       <div style="display:grid; gap:12px;">
+        <button type="submit"
+            class="block w-full rounded-xl text-white font-medium uppercase p-3 md:p-4
+                bg-gradient-to-b from-gray-700 to-gray-900 scale-up-center-normal">
+            Login
         </button>
+
+       <div class="or flex justify-center items-center my-2 font-bold tracking-wider text-gray-500">
+        or
+       </div>
+
+
+        <button
+            type="button"
+            id="githubBtn"
+            class="flex items-center justify-center gap-3 w-full rounded-xl
+                    text-white font-medium uppercase p-3 md:p-4
+                    bg-gradient-to-b from-purple-800 to-purple-900
+                    hover:opacity-95 transition scale-up-center-normal"
+            >
+  
+            <svg
+                class="w-5 h-5 md:w-6 md:h-6"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+            </svg>
+
+            <span>Login with GitHub</span>
+        </button>
+
+        </div>
+
 
         <div id="msg" class="mt-3 text-sm text-red-600 min-h-5"></div> <!--feedback reply--> 
       </form>

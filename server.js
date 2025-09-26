@@ -3,6 +3,9 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github2').Strategy;
 const { MongoClient, ObjectId, ServerApiVersion } = require('mongodb');
 const mime = require('mime');
 
@@ -24,11 +27,11 @@ const barbershopData = [
 function findService(id) { return barbershopData.find(s => s.id === Number(id)); }
 function computeRow(svc, tipInput) {
   const price = Number(svc.regularPrice);
-  const tax   = +(price * TAX_RATE).toFixed(2);
+  const tax   = + (price * TAX_RATE).toFixed(2);
   const tip   = tipInput == null || tipInput === '' ? +(price * DEFAULT_TIP).toFixed(2)
                : Number(tipInput) < 1 ? +(price * Number(tipInput)).toFixed(2)
                : +Number(tipInput).toFixed(2);
-  const total = +(price + tax + tip).toFixed(2);
+  const total = + (price + tax + tip).toFixed(2);
   return { service: svc.type, price, tax, tip, total, duration: svc.minLength };
 }
 
@@ -50,18 +53,62 @@ async function startDb() {
   await Tickets.createIndex({ owner: 1 });
 }
 
-app.use(express.json());
+app.use(express.json()); // middleware 
 app.use(cookieParser());
 app.use((req, res, next) => { res.setHeader('X-Content-Type-Options', 'nosniff'); next(); });
 
+
+if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1); // Oauth handshake session 
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { sameSite: 'lax', secure: process.env.NODE_ENV === 'production' }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => done(null, String(user._id || user.githubId || user.username)));
+passport.deserializeUser((id, done) => done(null, { id }));
+
+function setupOAuth() {
+  passport.use(new GitHubStrategy(
+    {
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: '/auth/github/callback'
+    },
+    async (_accessToken, _refreshToken, profile, done) => {
+      try {
+        let user = await Users.findOne({ githubId: profile.id });
+        if (!user) {
+          const username = profile.username || profile.displayName || `gh_${profile.id}`;
+          const avatarUrl = profile.photos?.[0]?.value || '';
+          const r = await Users.insertOne({
+            githubId: profile.id,
+            username,
+            avatarUrl,
+            createdAt: new Date()
+          });
+          user = { _id: r.insertedId, githubId: profile.id, username, avatarUrl };
+        }
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
+    }
+  ));
+}
+
 const AUTH_COOKIE = 'a3_user';
-function hasAuth(req) { return Boolean(req.cookies[AUTH_COOKIE]); }
+function hasAuth(req) { return Boolean(req.cookies[AUTH_COOKIE]); } // helpers
 function requireAuth(req, res, next) { if (!hasAuth(req)) return res.redirect('/login.html'); next(); }
 async function getUser(req) { const u = req.cookies[AUTH_COOKIE]; return u ? Users.findOne({ username: u }) : null; }
 
 const pub = p => path.join(__dirname, 'public', p);
 app.get('/login.html', (_req, res) => res.sendFile(pub('login.html')));
-app.post('/auth/login', async (req, res) => {
+app.post('/auth/login', async (req, res) => { // username & password login
   try {
     const { username, password } = req.body || {};
     const u = (username || '').trim(), p = password || '';
@@ -69,11 +116,36 @@ app.post('/auth/login', async (req, res) => {
     const existing = await Users.findOne({ username: u });
     if (!existing) await Users.insertOne({ username: u, password: p });
     else if (existing.password !== p) return res.status(401).json({ error: 'Incorrect password' });
-    res.cookie(AUTH_COOKIE, u, { httpOnly: true, sameSite: 'lax', maxAge: 14 * 24 * 60 * 60 * 1000 });
+    res.cookie(AUTH_COOKIE, u, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 14 * 24 * 60 * 60 * 1000 });
     res.json({ message: 'Logged in', username: u });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Login failed' }); }
 });
-app.post('/logout', (_req, res) => { res.clearCookie(AUTH_COOKIE); res.json({ message: 'Logged out' }); });
+
+app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+app.get('/auth/github/callback',
+  passport.authenticate('github', { failureRedirect: '/login.html' }),
+  async (req, res) => {
+    try {
+      const ghUser = req.user; 
+      if (!ghUser || !ghUser.username) return res.redirect('/login.html');
+
+      res.cookie(AUTH_COOKIE, ghUser.username, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 14 * 24 * 60 * 60 * 1000
+      });
+
+      res.redirect('/index.html');
+    } catch (e) {
+      console.error(e);
+      res.redirect('/login.html');
+    }
+  }
+);
+
+app.post('/logout', (req, res) => { res.clearCookie(AUTH_COOKIE); req.logout?.(() => {}); req.session?.destroy?.(() => {}); res.json({ message: 'Logging out' }); });
 
 app.get('/', requireAuth, (_req, res) => res.redirect('/index.html'));
 app.get('/index.html', requireAuth, (_req, res) => res.sendFile(pub('index.html')));
@@ -132,5 +204,5 @@ app.all('*', (req, res, next) => {
 });
 
 startDb()
-  .then(() => app.listen(PORT, () => console.log(`A3 running on http://localhost:${PORT}`)))
+  .then(() => { setupOAuth(); app.listen(PORT, () => console.log(`A3 running on http://localhost:${PORT}`)); })
   .catch(err => { console.error('Failed to start DB/server:', err); process.exit(1); });

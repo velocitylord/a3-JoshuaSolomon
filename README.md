@@ -23,4 +23,4 @@ requireAuth
 express-session 
 attachUser
 
-I implemented a barbershop app using Tailwind. I implemented Gradienty animations, layered images in the back/gradient/tint backgrounds, and various fonts which I accessed from google fonts. On the backend, i utilized express, MongoDB user creation, and custom middleware (attachUser/require) and managed routing to the login and home pages. Tailwind CLI builds styles.css, and the  server serves images for both pages.
+I implemented a barbershop app using Tailwind. I implemented animations from the website Gradienty, layered images in the back/gradient/tint backgrounds, utilized svg icon images from Heroicons, and used various fonts which I accessed from google fonts. On the backend, i utilized express, MongoDB user creation, and custom middleware (attachUser/require) and managed routing to the login and home pages. Tailwind CLI builds styles.css, and the  server serves images for both pages.
