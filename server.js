@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
 const { MongoClient, ObjectId, ServerApiVersion } = require('mongodb');
@@ -12,6 +13,7 @@ const mime = require('mime');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const uri = process.env.MONGODB_URI;
+const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
 
 const TAX_RATE = 0.08875;
 const DEFAULT_TIP = 0.12;
@@ -58,12 +60,23 @@ app.use(cookieParser());
 app.use((req, res, next) => { res.setHeader('X-Content-Type-Options', 'nosniff'); next(); });
 
 
-if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1); // Oauth handshake session 
+if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
+
+
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
   resave: false,
   saveUninitialized: false,
-  cookie: { sameSite: 'lax', secure: process.env.NODE_ENV === 'production' }
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    collectionName: 'sessions',
+    ttl: ONE_WEEK
+  }),
+  cookie: {
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production'
+  }
 }));
 
 app.use(passport.initialize());
@@ -116,7 +129,7 @@ app.post('/auth/login', async (req, res) => { // username & password login
     const existing = await Users.findOne({ username: u });
     if (!existing) await Users.insertOne({ username: u, password: p });
     else if (existing.password !== p) return res.status(401).json({ error: 'Incorrect password' });
-    res.cookie(AUTH_COOKIE, u, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 14 * 24 * 60 * 60 * 1000 });
+    res.cookie(AUTH_COOKIE, u, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: ONE_WEEK });
     res.json({ message: 'Logged in', username: u });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Login failed' }); }
 });
@@ -134,7 +147,7 @@ app.get('/auth/github/callback',
         httpOnly: true,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 14 * 24 * 60 * 60 * 1000
+        maxAge: ONE_WEEK
       });
 
       res.redirect('/index.html');
