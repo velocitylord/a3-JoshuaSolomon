@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); // loading environment variables
 
 const path = require('path');
 const express = require('express');
@@ -13,22 +13,23 @@ const mime = require('mime');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const uri = process.env.MONGODB_URI;
-const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
+const ONE_WEEK = 7 * 24 * 60 * 60 * 1000; // establishing cookies and session liftime
+const ONE_WEEKSEC = 7 * 24 * 60 * 60;
 
 const TAX_RATE = 0.08875;
 const DEFAULT_TIP = 0.12;
 
 const barbershopData = [
-  { id: 1, type: 'Modern Haircut',          regularPrice: 30, minLength: 40 },
+  { id: 1, type: 'Modern Haircut',          regularPrice: 30, minLength: 40 }, // service categories
   { id: 2, type: 'Mens Haircut with Beard', regularPrice: 45, minLength: 55 },
   { id: 3, type: 'Kids Haircut',            regularPrice: 20, minLength: 40 },
   { id: 4, type: 'Shape Up',                regularPrice: 15, minLength: 15 },
   { id: 5, type: 'Shape up with Beard',     regularPrice: 20, minLength: 25 }
 ];
 
-function findService(id) { return barbershopData.find(s => s.id === Number(id)); }
+function findService(id) { return barbershopData.find(s => s.id === Number(id)); } //find id
 function computeRow(svc, tipInput) {
-  const price = Number(svc.regularPrice);
+  const price = Number(svc.regularPrice); // computing total prices using subtotals of service price, tax, and tip
   const tax   = + (price * TAX_RATE).toFixed(2);
   const tip   = tipInput == null || tipInput === '' ? +(price * DEFAULT_TIP).toFixed(2)
                : Number(tipInput) < 1 ? +(price * Number(tipInput)).toFixed(2)
@@ -39,10 +40,10 @@ function computeRow(svc, tipInput) {
 
 
 const client = new MongoClient(uri, {
-  serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true } // mongo client connect
+  serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true } // mongo client 
 });
 
-let db, Users, Tickets;
+let db, Users, Tickets; // connecting and establishing client indexes
 async function startDb() {
   await client.connect();
   const dbNameFromUri = (() => {
@@ -55,23 +56,23 @@ async function startDb() {
   await Tickets.createIndex({ owner: 1 });
 }
 
-app.use(express.json()); // middleware 
+app.use(express.json()); // read cookies  
 app.use(cookieParser());
-app.use((req, res, next) => { res.setHeader('X-Content-Type-Options', 'nosniff'); next(); });
+app.use((req, res, next) => { res.setHeader('X-Content-Type-Options', 'nosniff'); next(); });  
 
 
-if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
+if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1); // reading node_env environment variable and trust Render proxy
 
 
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
+  secret: process.env.SESSION_SECRET || 'dev-secret-change-me', // oauth session 
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     collectionName: 'sessions',
-    ttl: ONE_WEEK
+    ttl: ONE_WEEKSEC
   }),
   cookie: {
     sameSite: 'lax',
@@ -79,14 +80,14 @@ app.use(session({
   }
 }));
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize()); //  initializing Passport
+app.use(passport.session()); 
 
 passport.serializeUser((user, done) => done(null, String(user._id || user.githubId || user.username)));
 passport.deserializeUser((id, done) => done(null, { id }));
 
 function setupOAuth() {
-  passport.use(new GitHubStrategy(
+  passport.use(new GitHubStrategy( // establishing GitHub strategy
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -98,7 +99,7 @@ function setupOAuth() {
         if (!user) {
           const username = profile.username || profile.displayName || `gh_${profile.id}`;
           const avatarUrl = profile.photos?.[0]?.value || '';
-          const r = await Users.insertOne({
+          const r = await Users.insertOne({ //adding new github user to the database
             githubId: profile.id,
             username,
             avatarUrl,
@@ -106,7 +107,7 @@ function setupOAuth() {
           });
           user = { _id: r.insertedId, githubId: profile.id, username, avatarUrl };
         }
-        return done(null, user);
+        return done(null, user); //already in database
       } catch (err) {
         return done(err);
       }
@@ -115,13 +116,13 @@ function setupOAuth() {
 }
 
 const AUTH_COOKIE = 'a3_user';
-function hasAuth(req) { return Boolean(req.cookies[AUTH_COOKIE]); } // helpers
+function hasAuth(req) { return Boolean(req.cookies[AUTH_COOKIE]); }// login page authentication cookie 
 function requireAuth(req, res, next) { if (!hasAuth(req)) return res.redirect('/login.html'); next(); }
 async function getUser(req) { const u = req.cookies[AUTH_COOKIE]; return u ? Users.findOne({ username: u }) : null; }
 
 const pub = p => path.join(__dirname, 'public', p);
 app.get('/login.html', (_req, res) => res.sendFile(pub('login.html')));
-app.post('/auth/login', async (req, res) => { // username & password login
+app.post('/auth/login', async (req, res) => { // creating username/password on first login attempt
   try {
     const { username, password } = req.body || {};
     const u = (username || '').trim(), p = password || '';
@@ -137,7 +138,7 @@ app.post('/auth/login', async (req, res) => { // username & password login
 app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
 
 app.get('/auth/github/callback',
-  passport.authenticate('github', { failureRedirect: '/login.html' }),
+  passport.authenticate('github', { failureRedirect: '/login.html' }), // GitHub authentication routing
   async (req, res) => {
     try {
       const ghUser = req.user; 
@@ -158,7 +159,7 @@ app.get('/auth/github/callback',
   }
 );
 
-app.post('/logout', (req, res) => { res.clearCookie(AUTH_COOKIE); req.logout?.(() => {}); req.session?.destroy?.(() => {}); res.json({ message: 'Logging out' }); });
+app.post('/logout', (req, res) => { res.clearCookie(AUTH_COOKIE); req.logout?.(() => {}); req.session?.destroy?.(() => {}); res.json({ message: 'Logging out' }); }); // clearing cookies when logged out
 
 app.get('/', requireAuth, (_req, res) => res.redirect('/index.html'));
 app.get('/index.html', requireAuth, (_req, res) => res.sendFile(pub('index.html')));
